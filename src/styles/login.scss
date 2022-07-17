@@ -1,0 +1,19 @@
+.login {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+    display: none;
+    &--show {
+        display: flex;
+    }
+}
+.signin {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+    &--show {
+        display: flex;
+    }
+}
