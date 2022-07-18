@@ -37,12 +37,14 @@ const getLoginInputs = () => {
     const passElem = document.querySelector("#password")
     return [ loginElem, passElem ]
 }
+
 const getSigninInputs = () => {
     const loginElem = document.querySelector("#username2")
     const passElem = document.querySelector("#password2")
     const passRepeatElem = document.querySelector("#password3")
     return [ loginElem, passElem, passRepeatElem ]
 }
+
 const isFormValid = (inputsElem) => {
     let isFormValid = true
     inputsElem.forEach( input => {
@@ -81,31 +83,6 @@ const getUserData = ([loginElem, passwordElem]) => {
 const authRequest = async (obj, route) => {
     const loader = document.querySelector(".loader")
     loader.classList.add("loader--show")
-
-    // await fetch(`${API}/login`, {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(obj)
-    // })  
-    //     .then((response) => {
-    //         document.querySelector(".loader").classList.remove("loader--show")
-    //         console.log(response);
-    //         if (response.ok) {
-    //             console.log("status", response.status);
-    //         return response.json();
-    //         } else {
-    //             throw Error(response.statusText);
-    //         }
-    //     })
-    //     .then((data) => {
-    //         console.log("json", data);
-    //     })
-    //     .catch((error) => {
-    //         console.log("error", error);
-    //     })
-    
     try {
         const response = await fetch(`${API}/${route}`, {
             method: 'POST',
@@ -123,8 +100,7 @@ const authRequest = async (obj, route) => {
         else throw Error(data);  
     } catch (error) {
         alert("Error: ", error)
-    } 
-    
+    }    
 }
 
 const handlerLoginSubmit = (e) => {
