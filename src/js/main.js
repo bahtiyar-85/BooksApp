@@ -101,14 +101,6 @@ const handlerUpdate = (e) => {
     const id = e.currentTarget.id
    
     getById(id)
-        // .then(response => {
-        //     if(response.ok) {
-        //         return response.json()
-        //     }
-        //     else {
-        //         throw new Error (response.json())
-        //     }
-        // })
         .then(data => renderUpdate(data))
         .catch(error => alert("Error", error))
     toggleModal("update-book")
@@ -242,18 +234,15 @@ const requestGetME = async () => {
     }    
 }
 
-const handlerCloseWindow = () => {
-    localStorage.removeItem('token')
-}
 
 export const mainInit = () => {
-    console.log("main");
     if(getToken()) {
         const addBtn = document.querySelector('.main__add-btn')
         const addBookForm = document.querySelector(".add-book__form")
         const deleteBookBtn = document.querySelector("#garbage1")
         const isFavorite = document.querySelector('#favorite1')
         const updateBookSubmit = document.querySelector(".update-book__form")
+        const signoutBtn = document.querySelector(".header__signout")
 
         requestGetBooks()
         requestGetME()
@@ -266,8 +255,11 @@ export const mainInit = () => {
             requestDelete(id)
             toggleModal('update-book')
         })
-        window.onbeforeunload = handlerCloseWindow;
+        signoutBtn?.addEventListener("click", () => {
+            window.location.href = "index.html" 
+        })
+        window.onbeforeunload = () => localStorage.removeItem('token');
     } else {
-        window.location.href = "index.html"
+        window.location.pathname.includes('main.html') ? window.location.href = "index.html" : null 
     }
 }

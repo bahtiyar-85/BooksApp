@@ -141,7 +141,6 @@ const addFocusListener = (elem) => {
 }
 
 export const authInit = () => {
-    console.log("auth");
     const loginFormElem = document.querySelector(".login")
     const signinFormElem = document.querySelector(".signin")
     const toggleElems = document.querySelectorAll(".toggle")
