@@ -1,7 +1,12 @@
 
 import { API } from "./api"
+import { loaderToggle } from "./auth"
+import { isFormValid } from "./auth"
+import { renderFormError } from "./auth"
+import { addFocusListener } from "./auth"
 
 const requestDelete = async (id) => {
+   loaderToggle()
     try {
         const response = await fetch(`${API}/books/delete/${id}`, {
             method: 'DELETE',
@@ -11,6 +16,7 @@ const requestDelete = async (id) => {
             }
         })
         const data = await response.json();
+        loaderToggle()
         if(response.ok) {
             requestGetBooks()
         }
@@ -36,6 +42,7 @@ const requestPut = async (id, obj) => {
 }
 
 const requestGetBooks = async () => {
+    loaderToggle()
     try {
         const response = await fetch(`${API}/books`, {
             method: 'GET',
@@ -45,6 +52,7 @@ const requestGetBooks = async () => {
             }
         })
         const data = await response.json();
+        loaderToggle()
         if(response.ok) {
             renderBooks(data)
             addListeners()
@@ -75,17 +83,6 @@ const getUpdateInputs = () => {
     return [name, author] 
 }
 
-const getById = async (id) => {
-    return await fetch(`${API}/books/${id}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Auth': getToken()
-        }})
-            .then(response => response.json())
-   
-}
-
 const renderUpdate = (book) => {
     const [nameElem, authorElem] = getUpdateInputs()
     const isFav = document.querySelector('#favorite1')
@@ -97,14 +94,24 @@ const renderUpdate = (book) => {
     book.isFavorite ? isFav.classList.add("liked") : isFav.classList.remove("liked")
 }
 
+const getById = async (id) => {
+    return await fetch(`${API}/books/${id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Auth': getToken()
+        }})
+            .then(response => response.json()) 
+}
+
 const handlerUpdate = (e) => {
     const id = e.currentTarget.id
-   
+    loaderToggle()
     getById(id)
         .then(data => renderUpdate(data))
         .catch(error => alert("Error", error))
-    toggleModal("update-book")
-    
+        .finally(() => loaderToggle())
+    toggleModal("update-book") 
 }
 
 const handlerUpdateSubmit = (e) => {
@@ -186,6 +193,7 @@ const toggleModal = (classname) => {
 }
 
 const requestPost = async (obj) => {
+    loaderToggle()
     try {
         const response = await fetch(`${API}/books/create`, {
             method: 'POST',
@@ -196,7 +204,7 @@ const requestPost = async (obj) => {
             body: JSON.stringify(obj)
         })
         const data = await response.json();
-      
+        loaderToggle()
         if(response.ok) {
             toggleModal('add-book')
             requestGetBooks()
@@ -209,13 +217,19 @@ const requestPost = async (obj) => {
 
 const handlerAddBook = (e) => {
     e.preventDefault()
-    const newBook = getNewBookData( getAddInputs())
-    requestPost(newBook)
+    const addInputs = getAddInputs()
+    if( isFormValid(addInputs)) {
+        const newBook = getNewBookData(addInputs)
+        requestPost(newBook)
+    } else {
+        renderFormError(addInputs)
+    }
 }
 
 const renderUsername = (username) => document.querySelector(".header__user").textContent = username
 
 const requestGetME = async () => {
+    loaderToggle()
     try {
         const response = await fetch(`${API}/me`, {
             method: 'GET',
@@ -225,6 +239,7 @@ const requestGetME = async () => {
             }
         })
         const data = await response.json();
+        loaderToggle()
         if(response.ok) {
             renderUsername(data.username)
         }
@@ -243,9 +258,15 @@ export const mainInit = () => {
         const isFavorite = document.querySelector('#favorite1')
         const updateBookSubmit = document.querySelector(".update-book__form")
         const signoutBtn = document.querySelector(".header__signout")
+        const closeAddModal = document.querySelector(".add-book__close") 
+        const closeUpdateModal = document.querySelector(".update-book__close") 
+        const addInputsElem = getAddInputs()
 
         requestGetBooks()
         requestGetME()
+        addInputsElem?.forEach(input => addFocusListener(input))
+        closeUpdateModal.addEventListener("click", () =>  toggleModal("update-book"))
+        closeAddModal.addEventListener("click", () =>  toggleModal("add-book"))
         isFavorite?.addEventListener('click', (e) => e.currentTarget.classList.toggle("liked"))
         addBookForm?.addEventListener("submit", (e) => handlerAddBook(e))
         addBtn?.addEventListener('click', () =>  toggleModal("add-book"))
@@ -258,7 +279,7 @@ export const mainInit = () => {
         signoutBtn?.addEventListener("click", () => {
             window.location.href = "index.html" 
         })
-        window.onbeforeunload = () => localStorage.removeItem('token');
+        // window.onbeforeunload = () => localStorage.removeItem('token');
     } else {
         window.location.pathname.includes('main.html') ? window.location.href = "index.html" : null 
     }

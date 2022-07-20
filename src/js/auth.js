@@ -23,7 +23,7 @@ const checkUserName = (logStr) => {
             error : "field is required"
         }        
     }
-    if(password.length < 3) {
+    if(logStr.length < 3) {
         return {
             valid : false,
             error : "should be more then 2 symbols"
@@ -45,7 +45,7 @@ const getSigninInputs = () => {
     return [ loginElem, passElem, passRepeatElem ]
 }
 
-const isFormValid = (inputsElem) => {
+export const isFormValid = (inputsElem) => {
     let isFormValid = true
     inputsElem.forEach( input => {
         if(input.type === "text"){
@@ -60,15 +60,14 @@ const isFormValid = (inputsElem) => {
     return isFormValid
 }
 
-const rengerFormError = (inputsElem) => {
+export const renderFormError = (inputsElem) => {
     inputsElem.forEach(input => {
-        if(input.type === "text"){
-            const result = checkUserName(input.value) 
-            result.valid ? null : input.classList.add("input--error")
-        }
-        if(input.type === "password"){
-            const result = checkPassword(input.value)
-            result.valid ? null : input.classList.add("input--error")
+        let result
+        input.type === "text" ? result = checkUserName(input.value) : null
+        input.type === "password" ? result = checkPassword(input.value) : null
+        if(!result.valid){ 
+            input.classList.add("input--error")
+            alert(result.error)
         }
     })
 }
@@ -80,9 +79,13 @@ const getUserData = ([loginElem, passwordElem]) => {
     }
 }
 
-const authRequest = async (obj, route) => {
+export const loaderToggle = () => {
     const loader = document.querySelector(".loader")
-    loader.classList.add("loader--show")
+    loader.classList.toggle("loader--show")
+}
+
+const authRequest = async (obj, route) => {
+    loaderToggle()
     try {
         const response = await fetch(`${API}/${route}`, {
             method: 'POST',
@@ -92,15 +95,17 @@ const authRequest = async (obj, route) => {
             body: JSON.stringify(obj)
         })
         const data = await response.json();
-        document.querySelector(".loader").classList.remove("loader--show")
+        console.log(data);
         if(response.ok) {
-            localStorage.setItem('token',data.token)
+            localStorage.setItem('token', data.token)
             window.location.href = 'main.html'
-        }
-        else throw Error(data);  
+        } else alert(data);  
     } catch (error) {
         alert("Error: ", error)
-    }    
+    } finally { 
+        loaderToggle()
+    }
+     
 }
 
 const handlerLoginSubmit = (e) => {
@@ -110,7 +115,7 @@ const handlerLoginSubmit = (e) => {
     if(isValid) {
         authRequest( getUserData(inputsElem), "login")
     } else {
-        rengerFormError(inputsElem)
+        renderFormError(inputsElem)
     }
 }
 
@@ -127,7 +132,7 @@ const handleSigninSubmit = (e) => {
         }
         else alert("Wrong password entered. Please try again")
     } else {
-        rengerFormError(inputsElem)
+        renderFormError(inputsElem)
     }
 }
 
@@ -136,7 +141,7 @@ const toggleModalsShow = () => {
     document.querySelector(".signin").classList.toggle("signin--show")
 }
 
-const addFocusListener = (elem) => {
+export const addFocusListener = (elem) => {
     elem?.addEventListener('focus', (e) => e.target.classList.remove("input--error"))
 }
 

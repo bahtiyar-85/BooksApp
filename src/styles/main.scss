@@ -127,16 +127,21 @@
 .add-book {
     display: none;
     width: 250px;
-    height: 250px;
+    height: 280px;
     &--show {
         display: block;
+    }
+    &__close {
+        width: 25px;
+        height: 25px;
+        cursor: pointer;
     }
 }
 
 .update-book {
     display: none;
     width: 300px;
-    height: 300px;
+    height: 330px;
 
     &--show {
         display: block;
@@ -145,5 +150,11 @@
         margin: 10px 0;
         display: flex;
         justify-content: space-around;
+    }
+
+    &__close {
+        width: 25px;
+        height: 25px;
+        cursor: pointer;
     }
 }
