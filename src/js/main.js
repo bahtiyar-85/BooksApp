@@ -142,6 +142,10 @@ const addListeners = () => {
 const renderBooks = (books) => {
     const elem = document.querySelector(".main__contant")
     elem.innerHTML = ""
+    if(books.length === 0) {
+        elem.innerHTML = `<h4 class="title">List is empty</h4>`
+        return 0
+    }
     books.forEach( book => {
         const card = document.createElement('div')
         card.classList.add('card')
@@ -265,8 +269,8 @@ export const mainInit = () => {
         requestGetBooks()
         requestGetME()
         addInputsElem?.forEach(input => addFocusListener(input))
-        closeUpdateModal.addEventListener("click", () =>  toggleModal("update-book"))
-        closeAddModal.addEventListener("click", () =>  toggleModal("add-book"))
+        closeUpdateModal?.addEventListener("click", () => toggleModal("update-book"))
+        closeAddModal?.addEventListener("click", () => toggleModal("add-book"))
         isFavorite?.addEventListener('click', (e) => e.currentTarget.classList.toggle("liked"))
         addBookForm?.addEventListener("submit", (e) => handlerAddBook(e))
         addBtn?.addEventListener('click', () =>  toggleModal("add-book"))
@@ -279,7 +283,7 @@ export const mainInit = () => {
         signoutBtn?.addEventListener("click", () => {
             window.location.href = "index.html" 
         })
-        // window.onbeforeunload = () => localStorage.removeItem('token');
+        window.onbeforeunload = () => localStorage.removeItem('token');
     } else {
         window.location.pathname.includes('main.html') ? window.location.href = "index.html" : null 
     }

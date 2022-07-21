@@ -1,35 +1,32 @@
 import { API } from "./api"
 
 const checkPassword = (password) => {
-    if(!password) {
+    if(password.length < 4) {
         return {
             valid : false,
-            error : "field is required"
-        }        
-    }
-    if(password.length < 6) {
-        return {
-            valid : false,
-            error : "should be more then 5 symbols"
+            error : "should be more then 3 symbols"
         }        
     }
     return { valid: true }
 }
 
-const checkUserName = (logStr) => {
-    if(!logStr) {
+const checkUserName = (str) => {
+    if(str.length < 2) {
         return {
             valid : false,
-            error : "field is required"
-        }        
-    }
-    if(logStr.length < 3) {
-        return {
-            valid : false,
-            error : "should be more then 2 symbols"
+            error : "should be more then 1 symbols"
         }        
     }
     return { valid: true }
+}
+
+const checkNumber = (num) => {
+    if(num >= 0){
+        return { valid: true}
+    } else return {
+        valid: false,
+        error: "should be positive number"
+    }
 }
 
 const getLoginInputs = () => {
@@ -42,29 +39,42 @@ const getSigninInputs = () => {
     const loginElem = document.querySelector("#username2")
     const passElem = document.querySelector("#password2")
     const passRepeatElem = document.querySelector("#password3")
-    return [ loginElem, passElem, passRepeatElem ]
+    const firstName = document.querySelector("#firstname")
+    const age = document.querySelector("#age")
+    return [ loginElem, passElem, passRepeatElem, firstName, age ]
 }
 
 export const isFormValid = (inputsElem) => {
     let isFormValid = true
     inputsElem.forEach( input => {
-        if(input.type === "text"){
-            const result = checkUserName(input.value)
-            !result.valid ? isFormValid = false : null
-        }
-        if(input.type === "password"){
-            const result = checkPassword(input.value)
-            !result.valid ? isFormValid = false : null
-        }
+        console.log(input);
+        let result
+        input.type === "text" && input.required ? result = checkUserName(input.value) : null
+        input.type === "password" ? result = checkPassword(input.value) : null
+        input.type === "number" ? result = checkNumber(input.value) : null
+        input.type === "text" ? result = {valid : true} : null
+        result.valid ? null : isFormValid = false
     })
     return isFormValid
+}
+
+const getExtendedData = ([,,, firstNameEl, ageEl], obj) => {
+    firstNameEl.value ? obj = {...obj, firstName: firstNameEl.value} : null
+    ageEl.value ? obj = {...obj, age: ageEl.value} : null
+    return obj
+}
+
+const cleanInputs = (inputs) => {
+    inputs.forEach( input => input.value = "")
 }
 
 export const renderFormError = (inputsElem) => {
     inputsElem.forEach(input => {
         let result
-        input.type === "text" ? result = checkUserName(input.value) : null
+        input.type === "text" && input.required ? result = checkUserName(input.value) : null
         input.type === "password" ? result = checkPassword(input.value) : null
+        input.type === "number" ? result = checkNumber(input.value) : null
+        input.type === "text" ? result = {valid : true} : null
         if(!result.valid){ 
             input.classList.add("input--error")
             alert(result.error)
@@ -76,7 +86,7 @@ const getUserData = ([loginElem, passwordElem]) => {
     return {
         username : loginElem.value,
         password : passwordElem.value
-    }
+    }  
 }
 
 export const loaderToggle = () => {
@@ -95,7 +105,6 @@ const authRequest = async (obj, route) => {
             body: JSON.stringify(obj)
         })
         const data = await response.json();
-        console.log(data);
         if(response.ok) {
             localStorage.setItem('token', data.token)
             window.location.href = 'main.html'
@@ -128,7 +137,9 @@ const handleSigninSubmit = (e) => {
     const passEquel = isEquel( inputsElem[1], inputsElem[2]) 
     if(isValid) {
         if(passEquel) {
-            authRequest( getUserData(inputsElem), "signin")
+            const data = getUserData(inputsElem)
+            const data2 = getExtendedData(inputsElem, data)
+            authRequest( data2 , "signin")
         }
         else alert("Wrong password entered. Please try again")
     } else {
