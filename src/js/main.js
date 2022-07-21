@@ -5,6 +5,18 @@ import { isFormValid } from "./auth"
 import { renderFormError } from "./auth"
 import { addFocusListener } from "./auth"
 
+const getRequest = async (id="") => {
+    let api
+    id ? api = `${API}/books/${id}` : api = `${API}/books`
+    return await fetch( api, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Auth': getToken()
+        }})
+            .then(response => response.json()) 
+}
+
 const requestDelete = async (id) => {
    loaderToggle()
     try {
@@ -42,24 +54,14 @@ const requestPut = async (id, obj) => {
 }
 
 const requestGetBooks = async () => {
-    loaderToggle()
-    try {
-        const response = await fetch(`${API}/books`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Auth': getToken()
-            }
-        })
-        const data = await response.json();
         loaderToggle()
-        if(response.ok) {
-            renderBooks(data)
-            addListeners()
-        } else throw Error(data);  
-    } catch (error) {
-        alert("Error: ", error)
-    } 
+        getRequest()
+            .then(data => {
+                renderBooks(data)
+                addListeners()
+            })
+            .catch(error => alert("Error", error))
+            .finally(() => loaderToggle())
 }
 
 
@@ -94,20 +96,11 @@ const renderUpdate = (book) => {
     book.isFavorite ? isFav.classList.add("liked") : isFav.classList.remove("liked")
 }
 
-const getById = async (id) => {
-    return await fetch(`${API}/books/${id}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Auth': getToken()
-        }})
-            .then(response => response.json()) 
-}
 
 const handlerUpdate = (e) => {
     const id = e.currentTarget.id
     loaderToggle()
-    getById(id)
+    getRequest(id)
         .then(data => renderUpdate(data))
         .catch(error => alert("Error", error))
         .finally(() => loaderToggle())
