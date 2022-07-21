@@ -42,6 +42,10 @@ module.exports = {
             filename: "main.html",
             template: './src/pages/main.html',
         }),
+        new HTMLWebpackPlugin({
+            filename: "bookpage.html",
+            template: './src/pages/bookpage.html',
+        }),
         new CleanWebpackPlugin(),
         new MiniCssExtractPlugin({
             filename: "styles.css",

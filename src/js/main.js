@@ -89,7 +89,7 @@ const renderUpdate = (book) => {
     const [nameElem, authorElem] = getUpdateInputs()
     const isFav = document.querySelector('#favorite1')
     const updateBtn = document.querySelector(".update-book__btn")
-
+    console.log(book);
     updateBtn.id = book.id
     nameElem.value = book.name
     authorElem.value = book.author

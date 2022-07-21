@@ -29,6 +29,20 @@
         display: inline-block;
         text-align: right;
         font-size: 20px;
+        position: relative;
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -30px;
+            width: 25px;
+            height: 25px;
+            background-image: url(https://cdn-icons-png.flaticon.com/128/527/527489.png);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: inherit;
+        }
     }
     &__signout {
         display: inline-block;
